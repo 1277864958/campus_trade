@@ -133,7 +133,7 @@ onMounted(loadOrders)
 async function loadOrders() {
   loading.value = true
   try {
-    const api = activeTab.value === 'purchases' ? '/api/orders/purchases' : '/api/orders/sales'
+    const api = activeTab.value === 'purchases' ? '/orders/purchases' : '/orders/sales'
     const res = await request.get(api, { params: { page: currentPage.value - 1, size: pageSize } })
     orders.value = res.data.data?.list || []
     total.value  = res.data.data?.total || 0
@@ -142,21 +142,21 @@ async function loadOrders() {
 
 async function handleConfirm(id) {
   await ElMessageBox.confirm('确认已与买家完成交易安排？', '确认订单', { type: 'info' })
-  await request.put(`/api/orders/${id}/confirm`)
+  await request.put(`/orders/${id}/confirm`)
   ElMessage.success('订单已确认')
   loadOrders()
 }
 
 async function handleFinish(id) {
   await ElMessageBox.confirm('确认已收到商品？确认后订单将完成', '确认收货', { type: 'success' })
-  await request.put(`/api/orders/${id}/finish`)
+  await request.put(`/orders/${id}/finish`)
   ElMessage.success('订单已完成')
   loadOrders()
 }
 
 async function handleCancel(id) {
   await ElMessageBox.confirm('确认取消此订单？', '取消订单', { type: 'warning' })
-  await request.put(`/api/orders/${id}/cancel`)
+  await request.put(`/orders/${id}/cancel`)
   ElMessage.success('订单已取消')
   loadOrders()
 }
@@ -173,7 +173,7 @@ async function submitReview() {
   if (!reviewForm.score) return ElMessage.warning('请打分')
   submitting.value = true
   try {
-    await request.post('/api/orders/review', { ...reviewForm })
+    await request.post('/orders/review', { ...reviewForm })
     ElMessage.success('评价成功')
     reviewDialog.value = false
     loadOrders()
@@ -182,7 +182,7 @@ async function submitReview() {
 
 async function goChat(order) {
   const sellerId = activeTab.value === 'purchases' ? order.sellerId : order.buyerId
-  const res = await request.post('/api/chat/sessions', { sellerId, goodsId: order.goodsId })
+  const res = await request.post('/chat/sessions', { sellerId, goodsId: order.goodsId })
   router.push(`/chat/${res.data.data.sessionId}`)
 }
 

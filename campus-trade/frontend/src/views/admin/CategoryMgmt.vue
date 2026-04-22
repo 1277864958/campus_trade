@@ -39,20 +39,20 @@ const form=reactive({name:'',icon:'',sort:0,parentId:null})
 onMounted(load)
 async function load(){
   loading.value=true
-  try{const res=await request.get('/api/categories');categories.value=res.data.data||[]}
+  try{const res=await request.get('/categories');categories.value=res.data.data||[]}
   finally{loading.value=false}
 }
 function openAdd(parentId){Object.assign(form,{name:'',icon:'',sort:0,parentId});dialog.value=true}
 async function save(){
   saving.value=true
   try{
-    await request.post('/api/admin/categories',null,{params:{name:form.name,parentId:form.parentId,icon:form.icon,sort:form.sort}})
+    await request.post('/admin/categories',null,{params:{name:form.name,parentId:form.parentId,icon:form.icon,sort:form.sort}})
     ElMessage.success('添加成功');dialog.value=false;load()
   }finally{saving.value=false}
 }
 async function del(row){
   await ElMessageBox.confirm(`确认删除分类「${row.name}」？`,'删除',{type:'warning'})
-  await request.delete(`/api/admin/categories/${row.id}`)
+  await request.delete(`/admin/categories/${row.id}`)
   ElMessage.success('已删除');load()
 }
 </script>

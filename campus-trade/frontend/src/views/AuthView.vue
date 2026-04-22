@@ -92,7 +92,7 @@ async function handleLogin() {
   await loginFormRef.value.validate()
   loading.value = true
   try {
-    const res = await request.post('/api/auth/login', loginForm)
+    const res = await request.post('/auth/login', loginForm)
     const { accessToken, refreshToken, ...info } = res.data.data
     userStore.setTokens(accessToken, refreshToken)
     userStore.setUserInfo({ id: info.userId, username: info.username, role: info.role })
@@ -107,7 +107,7 @@ async function handleRegister() {
   await regFormRef.value.validate()
   loading.value = true
   try {
-    await request.post('/api/auth/register', {
+    await request.post('/auth/register', {
       username: regForm.username,
       password: regForm.password,
       phone:    regForm.phone || undefined,

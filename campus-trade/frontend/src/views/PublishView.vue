@@ -124,11 +124,11 @@ const uploadHeaders = computed(() => ({
 }))
 
 onMounted(async () => {
-  const catRes = await request.get('/api/categories')
+  const catRes = await request.get('/categories')
   categoryOptions.value = catRes.data.data || []
 
   if (isEdit.value) {
-    const res = await request.get(`/api/goods/${route.params.id}`)
+    const res = await request.get(`/goods/${route.params.id}`)
     const g = res.data.data
     Object.assign(form, {
       title:         g.title,
@@ -168,10 +168,10 @@ async function submit(status) {
   try {
     const payload = { ...form, status }
     if (isEdit.value) {
-      await request.put(`/api/goods/${route.params.id}`, payload)
+      await request.put(`/goods/${route.params.id}`, payload)
       ElMessage.success('修改成功')
     } else {
-      const res = await request.post('/api/goods', payload)
+      const res = await request.post('/goods', payload)
       ElMessage.success(status === 'ON_SALE' ? '发布成功' : '草稿已保存')
     }
     router.push('/my-goods')

@@ -33,7 +33,7 @@ request.interceptors.response.use(
 
     // 401 且不是 refresh 接口本身 → 尝试刷新 Token
     if (status === 401 && !originalReq._retry
-        && !originalReq.url?.includes('/auth/refresh')) {
+        && !originalReq.url?.includes('auth/refresh')) {
       originalReq._retry = true
       const refreshToken = localStorage.getItem('refresh_token')
 
@@ -44,7 +44,7 @@ request.interceptors.response.use(
       if (!isRefreshing) {
         isRefreshing = true
         try {
-          const res = await axios.post('/api/auth/refresh', { refreshToken })
+          const res = await request.post('/auth/refresh', { refreshToken })
           const { accessToken, refreshToken: newRefresh } = res.data.data
           localStorage.setItem('access_token', accessToken)
           localStorage.setItem('refresh_token', newRefresh)

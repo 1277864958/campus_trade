@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="校园二手交易平台 — 让闲置发挥价值" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>校园二手交易平台</title>
+
+    <!-- 防止 FOUC（无样式内容闪烁） -->
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+        background: #f5f6fa;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      /* 首屏加载占位，Vue 挂载后自动消失 */
+      #app:empty::before {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 40px;
+        margin: 200px auto 0;
+        border: 3px solid #e0e0e0;
+        border-top-color: #2e7d32;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Vue 3 挂载节点 -->
+    <div id="app"></div>
+
+    <!-- Vite 入口（构建时自动注入 hash 文件名） -->
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

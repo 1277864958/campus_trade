@@ -38,12 +38,12 @@ onMounted(load)
 async function load(){
   loading.value=true
   try{
-    const res=await request.get('/api/admin/reports',{params:{status:filterStatus.value||undefined,page:page.value-1,size:20}})
+    const res=await request.get('/admin/reports',{params:{status:filterStatus.value||undefined,page:page.value-1,size:20}})
     reports.value=res.data.data?.list||[];total.value=res.data.data?.total||0
   }finally{loading.value=false}
 }
 async function handle(row,action){
-  await request.put(`/api/admin/reports/${row.id}/handle`,null,{params:{action}})
+  await request.put(`/admin/reports/${row.id}/handle`,null,{params:{action}})
   ElMessage.success('处理成功');load()
 }
 const st=s=>({PENDING:'warning',HANDLED:'success',DISMISSED:'info'}[s]||'')

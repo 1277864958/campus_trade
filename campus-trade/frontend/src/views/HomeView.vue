@@ -137,7 +137,7 @@ watch(() => route.query.keyword, val => {
 })
 
 async function loadCategories() {
-  const res = await request.get('/api/categories')
+  const res = await request.get('/categories')
   // 只取一级分类展示
   categories.value = (res.data.data || []).map(c => ({ id: c.id, name: c.name }))
 }
@@ -154,7 +154,7 @@ async function loadGoods() {
     params.sortBy = searchForm.sortBy
     params.page   = searchForm.page
     params.size   = searchForm.size
-    const res = await request.get('/api/goods', { params })
+    const res = await request.get('/goods', { params })
     goodsList.value = res.data.data?.list || []
     total.value     = res.data.data?.total || 0
   } finally {

@@ -128,10 +128,10 @@ const isSelf = computed(() =>
 
 onMounted(async () => {
   try {
-    const res = await request.get(`/api/goods/${route.params.id}`)
+    const res = await request.get(`/goods/${route.params.id}`)
     goods.value = res.data.data
     // 获取卖家评分
-    const revRes = await request.get(`/api/orders/reviews/${goods.value.sellerId}`)
+    const revRes = await request.get(`/orders/reviews/${goods.value.sellerId}`)
     const reviews = revRes.data.data || []
     if (reviews.length) {
       sellerScore.value = reviews.reduce((s, r) => s + r.score, 0) / reviews.length
@@ -141,7 +141,7 @@ onMounted(async () => {
 
 async function handleChat() {
   if (!userStore.isLogin) return router.push('/auth')
-  const res = await request.post('/api/chat/sessions', {
+  const res = await request.post('/chat/sessions', {
     sellerId: goods.value.sellerId,
     goodsId:  goods.value.id,
   })
@@ -156,7 +156,7 @@ function handleOrder() {
 async function confirmOrder() {
   ordering.value = true
   try {
-    await request.post('/api/orders', { goodsId: goods.value.id, remark: orderRemark.value })
+    await request.post('/orders', { goodsId: goods.value.id, remark: orderRemark.value })
     ElMessage.success('下单成功！请等待卖家确认')
     orderDialog.value = false
     router.push('/orders')
@@ -167,7 +167,7 @@ async function submitReport() {
   if (!reportReason.value.trim()) return ElMessage.warning('请填写举报原因')
   reporting.value = true
   try {
-    await request.post('/api/goods/report', { goodsId: goods.value.id, reason: reportReason.value })
+    await request.post('/goods/report', { goodsId: goods.value.id, reason: reportReason.value })
     ElMessage.success('举报已提交，感谢您的反馈')
     reportDialog.value = false
     reportReason.value = ''
@@ -175,14 +175,14 @@ async function submitReport() {
 }
 
 async function changeStatus(action) {
-  await request.put(`/api/goods/${goods.value.id}/${action}`)
+  await request.put(`/goods/${goods.value.id}/${action}`)
   ElMessage.success(action === 'on-sale' ? '已上架' : '已下架')
   goods.value.status = action === 'on-sale' ? 'ON_SALE' : 'DRAFT'
 }
 
 async function handleDelete() {
   await ElMessageBox.confirm('确认删除该商品？删除后不可恢复', '删除确认', { type: 'warning' })
-  await request.delete(`/api/goods/${goods.value.id}`)
+  await request.delete(`/goods/${goods.value.id}`)
   ElMessage.success('已删除')
   router.push('/my-goods')
 }

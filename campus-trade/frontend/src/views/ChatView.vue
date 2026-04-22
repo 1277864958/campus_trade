@@ -158,7 +158,7 @@ onUnmounted(() => {
 async function loadSessions() {
   sessionsLoading.value = true
   try {
-    const res = await request.get('/api/chat/sessions')
+    const res = await request.get('/chat/sessions')
     sessions.value = res.data.data || []
   } finally { sessionsLoading.value = false }
 }
@@ -191,7 +191,7 @@ async function loadHistory() {
   historyLoading.value = true
   try {
     const res = await request.get(
-      `/api/chat/sessions/${currentSessionId.value}/messages`,
+      `/chat/sessions/${currentSessionId.value}/messages`,
       { params: { page: currentPage.value, size: 20 } }
     )
     const data = res.data.data

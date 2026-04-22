@@ -32,7 +32,7 @@ export const useUserStore = defineStore('user', () => {
 
   async function fetchMe() {
     try {
-      const res = await request.get('/api/auth/me')
+      const res = await request.get('/auth/me')
       setUserInfo(res.data.data)
     } catch (_) {}
   }

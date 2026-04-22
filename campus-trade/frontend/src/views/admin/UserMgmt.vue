@@ -33,17 +33,17 @@ const users=ref([]),loading=ref(false),total=ref(0),page=ref(1)
 onMounted(load)
 async function load(){
   loading.value=true
-  try{const res=await request.get('/api/admin/users',{params:{page:page.value-1,size:20}});users.value=res.data.data?.list||[];total.value=res.data.data?.total||0}
+  try{const res=await request.get('/admin/users',{params:{page:page.value-1,size:20}});users.value=res.data.data?.list||[];total.value=res.data.data?.total||0}
   finally{loading.value=false}
 }
 async function toggleStatus(row){
   const ns=row.status?0:1
-  await request.put(`/api/admin/users/${row.id}/status`,null,{params:{status:ns}})
+  await request.put(`/admin/users/${row.id}/status`,null,{params:{status:ns}})
   row.status=ns;ElMessage.success(ns?'已启用':'已禁用')
 }
 async function resetPwd(row){
   const{value:pwd}=await ElMessageBox.prompt('请输入新密码（至少6位）','重置密码',{inputType:'password',inputValidator:v=>v&&v.length>=6||'密码至少6位'})
-  await request.put(`/api/admin/users/${row.id}/reset-password`,null,{params:{newPassword:pwd}})
+  await request.put(`/admin/users/${row.id}/reset-password`,null,{params:{newPassword:pwd}})
   ElMessage.success('密码已重置')
 }
 </script>

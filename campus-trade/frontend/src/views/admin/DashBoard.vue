@@ -17,7 +17,7 @@ import request from '../../utils/request'
 const stat = ref({})
 const stats = ref([])
 onMounted(async () => {
-  const res = await request.get('/api/admin/stat')
+  const res = await request.get('/admin/stat')
   stat.value = res.data.data || {}
   stats.value = [
     { label: '注册用户', value: stat.value.totalUsers || 0 },

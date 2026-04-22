@@ -10,7 +10,7 @@ export const useChatStore = defineStore('chat', () => {
 
   async function fetchUnread() {
     try {
-      const res = await request.get('/api/chat/unread')
+      const res = await request.get('/chat/unread')
       const list = res.data.data || []
       const map = {}
       list.forEach(item => { map[item.sessionId] = item.unreadCount })

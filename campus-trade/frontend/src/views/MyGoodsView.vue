@@ -41,15 +41,15 @@ onMounted(loadGoods)
 async function loadGoods(){
   loading.value=true
   try{
-    const res=await request.get('/api/goods/my',{params:{status:activeStatus.value||undefined,page:page.value-1,size:12}})
+    const res=await request.get('/goods/my',{params:{status:activeStatus.value||undefined,page:page.value-1,size:12}})
     goods.value=res.data.data?.list||[]; total.value=res.data.data?.total||0
   }finally{loading.value=false}
 }
-async function onSale(g){ await request.put(`/api/goods/${g.id}/on-sale`); ElMessage.success('已上架'); loadGoods() }
-async function takeDown(g){ await request.put(`/api/goods/${g.id}/take-down`); ElMessage.success('已下架'); loadGoods() }
+async function onSale(g){ await request.put(`/goods/${g.id}/on-sale`); ElMessage.success('已上架'); loadGoods() }
+async function takeDown(g){ await request.put(`/goods/${g.id}/take-down`); ElMessage.success('已下架'); loadGoods() }
 async function del(g){
   await ElMessageBox.confirm('确认删除该商品？','删除',{type:'warning'})
-  await request.delete(`/api/goods/${g.id}`); ElMessage.success('已删除'); loadGoods()
+  await request.delete(`/goods/${g.id}`); ElMessage.success('已删除'); loadGoods()
 }
 const st=s=>({ON_SALE:'success',DRAFT:'danger',SOLD:'info',RESERVED:'warning'}[s]||'')
 const sl=s=>({ON_SALE:'在售',DRAFT:'草稿',SOLD:'已售',RESERVED:'已预订'}[s]||s)

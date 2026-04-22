@@ -23,7 +23,7 @@ onMounted(load)
 async function load(){
   loading.value=true
   try{
-    const res=await request.get('/api/goods/history',{params:{page:page.value-1,size:12}})
+    const res=await request.get('/goods/history',{params:{page:page.value-1,size:12}})
     goods.value=res.data.data?.list||[]; total.value=res.data.data?.total||0
   }finally{loading.value=false}
 }

@@ -62,16 +62,16 @@ const form=reactive({username:'',nickname:'',phone:'',email:'',avatarUrl:''})
 const pwdForm=reactive({oldPassword:'',newPassword:'',confirmPassword:''})
 const headers=computed(()=>({Authorization:`Bearer ${localStorage.getItem('access_token')}`}))
 onMounted(async()=>{
-  const res=await request.get('/api/auth/me')
+  const res=await request.get('/auth/me')
   const u=res.data.data; Object.assign(form,u)
-  const rv=await request.get(`/api/orders/reviews/${u.id}`)
+  const rv=await request.get(`/orders/reviews/${u.id}`)
   reviews.value=rv.data.data||[]
   if(reviews.value.length) avgScore.value=reviews.value.reduce((s,r)=>s+r.score,0)/reviews.value.length
 })
 async function save(){
   saving.value=true
   try{
-    const res=await request.put('/api/auth/me',{nickname:form.nickname,phone:form.phone,email:form.email,avatarUrl:form.avatarUrl})
+    const res=await request.put('/auth/me',{nickname:form.nickname,phone:form.phone,email:form.email,avatarUrl:form.avatarUrl})
     userStore.setUserInfo(res.data.data); ElMessage.success('保存成功')
   }finally{saving.value=false}
 }
@@ -79,7 +79,7 @@ async function changePwd(){
   if(pwdForm.newPassword!==pwdForm.confirmPassword) return ElMessage.error('两次密码不一致')
   pwdSaving.value=true
   try{
-    await request.put('/api/auth/password',{oldPassword:pwdForm.oldPassword,newPassword:pwdForm.newPassword,confirmPassword:pwdForm.confirmPassword})
+    await request.put('/auth/password',{oldPassword:pwdForm.oldPassword,newPassword:pwdForm.newPassword,confirmPassword:pwdForm.confirmPassword})
     ElMessage.success('密码修改成功'); Object.assign(pwdForm,{oldPassword:'',newPassword:'',confirmPassword:''})
   }finally{pwdSaving.value=false}
 }

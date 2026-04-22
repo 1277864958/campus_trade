@@ -31,12 +31,12 @@ const goods=ref([]),loading=ref(false),total=ref(0),page=ref(1)
 onMounted(load)
 async function load(){
   loading.value=true
-  try{const res=await request.get('/api/admin/goods',{params:{page:page.value-1,size:20}});goods.value=res.data.data?.list||[];total.value=res.data.data?.total||0}
+  try{const res=await request.get('/admin/goods',{params:{page:page.value-1,size:20}});goods.value=res.data.data?.list||[];total.value=res.data.data?.total||0}
   finally{loading.value=false}
 }
 async function takeDown(row){
   await ElMessageBox.confirm(`确认强制下架「${row.title}」？`,'下架确认',{type:'warning'})
-  await request.put(`/api/admin/goods/${row.id}/take-down`);row.status='DRAFT';ElMessage.success('已强制下架')
+  await request.put(`/admin/goods/${row.id}/take-down`);row.status='DRAFT';ElMessage.success('已强制下架')
 }
 const st=s=>({ON_SALE:'success',DRAFT:'danger',SOLD:'info',RESERVED:'warning'}[s]||'')
 const sl=s=>({ON_SALE:'在售',DRAFT:'草稿',SOLD:'已售',RESERVED:'已预订'}[s]||s)
