@@ -13,7 +13,8 @@ public class FileController {
     private final FileService fileService;
 
     @PostMapping("/image")
-    public Result<Void> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
-        return Result.success(fileService.uploadImage(file));
+    public Result<String> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+        String url = fileService.uploadImage(file);
+        return Result.success("上传成功", url);
     }
 }

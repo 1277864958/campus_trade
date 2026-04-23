@@ -241,3 +241,70 @@ INSERT INTO users (username, password_hash, nickname, role, status) VALUES
 ('admin',
  '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQyCVHGkGjxJ8NMGXzUKzuBuq',
  '系统管理员', 'ADMIN', 1);
+
+-- ============================================================
+-- 初始化：示例用户（密码均为 admin123456）
+-- ============================================================
+INSERT INTO users (username, password_hash, nickname, avatar_url, phone, email, role, status) VALUES
+('zhangsan', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQyCVHGkGjxJ8NMGXzUKzuBuq', '张三', NULL, '13800000001', 'zhangsan@campus.edu', 'USER', 1),
+('lisi',     '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQyCVHGkGjxJ8NMGXzUKzuBuq', '李四', NULL, '13800000002', 'lisi@campus.edu',     'USER', 1),
+('wangwu',   '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQyCVHGkGjxJ8NMGXzUKzuBuq', '王五', NULL, '13800000003', 'wangwu@campus.edu',   'USER', 1),
+('zhaoliu',  '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQyCVHGkGjxJ8NMGXzUKzuBuq', '赵六', NULL, '13800000004', 'zhaoliu@campus.edu',  'USER', 1),
+('xiaoming', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQyCVHGkGjxJ8NMGXzUKzuBuq', '小明', NULL, '13800000005', 'xiaoming@campus.edu', 'USER', 1),
+('xiaohong', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQyCVHGkGjxJ8NMGXzUKzuBuq', '小红', NULL, '13800000006', 'xiaohong@campus.edu', 'USER', 1);
+
+-- ============================================================
+-- 初始化：示例商品（seller_id 对应上面的用户）
+-- ============================================================
+INSERT INTO goods (seller_id, title, description, price, original_price, category_id, status, views, likes, location) VALUES
+(2, 'iPhone 14 Pro 256G 暗紫色', '去年9月购入，电池健康92%，无磕碰，全原装配件齐全，贴膜戴壳使用', 4999.00, 8999.00, 7, 'ON_SALE', 128, 23, '西区快递站'),
+(2, '2024款 MacBook Air M3 15寸', '今年3月购入，仅办公使用，循环次数不到50，送原装充电器和保护壳', 8500.00, 12999.00, 8, 'ON_SALE', 256, 45, '图书馆一楼大厅'),
+(3, '高等数学同济第七版上下册', '考完试了用不到了，书本干净无笔记，附赠配套习题册', 25.00, 89.00, 11, 'ON_SALE', 89, 12, '教学楼A栋门口'),
+(3, '考研英语真题黄皮书2024', '做了一半，答案册全新未拆，适合25考研同学', 35.00, 68.00, 12, 'ON_SALE', 67, 8, '图书馆二楼'),
+(4, 'AirPods Pro 2 USB-C版', '使用半年，降噪效果完美，耳塞全新替换过，带原装盒', 899.00, 1899.00, 9, 'ON_SALE', 198, 34, '南门星巴克'),
+(4, '索尼WH-1000XM5 头戴式耳机', '银色款，佩戴舒适降噪顶级，配件齐全带收纳包', 1299.00, 2999.00, 9, 'ON_SALE', 145, 28, '东区食堂门口'),
+(5, '宿舍小冰箱 45L', '大二买的，制冷正常无异味，毕业带不走低价出', 150.00, 599.00, 14, 'ON_SALE', 76, 15, '北区宿舍楼下'),
+(5, '小米台灯Pro', '护眼台灯，亮度可调，考研期间陪伴神器，九成新', 89.00, 249.00, 14, 'ON_SALE', 54, 9, '北区宿舍楼下'),
+(6, '威尔胜NBA官方比赛用球', '室内球，手感极佳，买来打了不到10次，几乎全新', 120.00, 299.00, 16, 'ON_SALE', 43, 7, '体育馆门口'),
+(6, '迪卡侬瑜伽垫 加厚款', '6mm加厚防滑，用过几次，清洗干净了', 39.00, 99.00, 17, 'ON_SALE', 32, 5, '体育馆门口'),
+(7, 'iPad Air 5 64G WiFi版', '星光色，配了类纸膜和妙控键盘，上课记笔记神器', 2800.00, 4799.00, 7, 'ON_SALE', 312, 56, '西区快递站'),
+(7, '线性代数+概率论教材套装', '同济版线代+浙大版概率论，有少量铅笔笔记可擦除', 20.00, 76.00, 11, 'ON_SALE', 45, 6, '教学楼B栋'),
+(2, '佳能EOS R50 微单相机', '今年初购入，快门次数不到2000，送64G存储卡和相机包', 4200.00, 5999.00, 10, 'ON_SALE', 167, 31, '图书馆一楼大厅'),
+(3, 'Switch OLED 白色 + 3游戏', '附塞尔达王国之泪、马里奥奥德赛、健身环，全套出', 1800.00, 2998.00, 7, 'ON_SALE', 223, 42, '南门星巴克'),
+(4, '优衣库联名T恤 5件套装', 'M码，KAWS/村上隆联名款，每件只穿过1-2次，打包出', 99.00, 395.00, 5, 'ON_SALE', 88, 14, '东区食堂门口'),
+(5, '小米空气净化器4 Pro', '滤芯刚换新，适合宿舍或出租屋使用，静音效果好', 399.00, 999.00, 14, 'ON_SALE', 61, 11, '北区宿舍楼下'),
+(6, '考研政治肖秀荣全套2025', '肖四肖八+精讲精练+1000题，全新未拆封', 55.00, 158.00, 12, 'ON_SALE', 134, 22, '图书馆二楼'),
+(7, '罗技MX Master 3S 鼠标', '深灰色，办公鼠标天花板，手感极佳，送鼠标垫', 399.00, 749.00, 8, 'ON_SALE', 95, 18, '西区快递站'),
+(2, '大学物理实验报告册（已填写参考）', '上学期的实验报告，数据完整可参考，帮你省时间', 10.00, 15.00, 13, 'ON_SALE', 201, 35, '教学楼A栋门口'),
+(3, '哑铃套装 20kg 可调节', '包胶哑铃不伤地板，宿舍健身必备，买来练了两个月', 80.00, 199.00, 17, 'ON_SALE', 38, 6, '体育馆门口');
+
+-- ============================================================
+-- 初始化：商品图片（使用 picsum 占位图）
+-- ============================================================
+INSERT INTO goods_images (goods_id, image_url, sort_order) VALUES
+(1, 'https://picsum.photos/seed/phone1/600/450', 0),
+(1, 'https://picsum.photos/seed/phone1b/600/450', 1),
+(2, 'https://picsum.photos/seed/laptop1/600/450', 0),
+(2, 'https://picsum.photos/seed/laptop1b/600/450', 1),
+(3, 'https://picsum.photos/seed/book1/600/450', 0),
+(4, 'https://picsum.photos/seed/book2/600/450', 0),
+(5, 'https://picsum.photos/seed/airpods1/600/450', 0),
+(5, 'https://picsum.photos/seed/airpods1b/600/450', 1),
+(6, 'https://picsum.photos/seed/headphone1/600/450', 0),
+(7, 'https://picsum.photos/seed/fridge1/600/450', 0),
+(8, 'https://picsum.photos/seed/lamp1/600/450', 0),
+(9, 'https://picsum.photos/seed/basketball1/600/450', 0),
+(10, 'https://picsum.photos/seed/yoga1/600/450', 0),
+(11, 'https://picsum.photos/seed/ipad1/600/450', 0),
+(11, 'https://picsum.photos/seed/ipad1b/600/450', 1),
+(12, 'https://picsum.photos/seed/mathbook1/600/450', 0),
+(13, 'https://picsum.photos/seed/camera1/600/450', 0),
+(13, 'https://picsum.photos/seed/camera1b/600/450', 1),
+(14, 'https://picsum.photos/seed/switch1/600/450', 0),
+(14, 'https://picsum.photos/seed/switch1b/600/450', 1),
+(15, 'https://picsum.photos/seed/tshirt1/600/450', 0),
+(16, 'https://picsum.photos/seed/purifier1/600/450', 0),
+(17, 'https://picsum.photos/seed/politics1/600/450', 0),
+(18, 'https://picsum.photos/seed/mouse1/600/450', 0),
+(19, 'https://picsum.photos/seed/physics1/600/450', 0),
+(20, 'https://picsum.photos/seed/dumbbell1/600/450', 0);

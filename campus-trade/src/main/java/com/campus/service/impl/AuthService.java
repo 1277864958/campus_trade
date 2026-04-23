@@ -28,6 +28,7 @@ public class AuthService {
     private final PasswordEncoder     encoder;
     private final JwtUtils            jwtUtils;
     private final StringRedisTemplate redis;
+    private final CaptchaService      captchaService;
 
     private static final String REFRESH_PREFIX   = "auth:refresh:";
     private static final String BLACKLIST_PREFIX  = "auth:blacklist:";
@@ -54,6 +55,9 @@ public class AuthService {
 
     // ── 登录 ─────────────────────────────────────────────────
     public TokenResp login(LoginReq req) {
+        if (!captchaService.verify(req.getCaptchaId(), req.getCaptchaCode()))
+            throw BusinessException.of("验证码错误或已过期");
+
         User u = userRepo.findByUsername(req.getUsername())
                 .or(() -> userRepo.findByPhone(req.getUsername()))
                 .orElseThrow(() -> BusinessException.of("账号或密码错误"));
@@ -98,6 +102,29 @@ public class AuthService {
             throw BusinessException.of("旧密码错误");
         u.setPasswordHash(encoder.encode(req.getNewPassword()));
         userRepo.save(u);
+    }
+
+    // ── 忘记密码（通过用户名+手机号验证身份）─────────────────
+    @Transactional
+    public void resetPassword(ResetPasswordReq req) {
+        if (!captchaService.verify(req.getCaptchaId(), req.getCaptchaCode()))
+            throw BusinessException.of("验证码错误或已过期");
+
+        User u = userRepo.findByUsername(req.getUsername())
+                .orElseThrow(() -> BusinessException.of("用户不存在"));
+
+        if ("ADMIN".equals(u.getRole()))
+            throw BusinessException.of("管理员账号不支持此操作，请联系系统管理员");
+
+        if (u.getPhone() == null || u.getPhone().isBlank())
+            throw BusinessException.of("该账号未绑定手机号，无法重置密码");
+
+        if (!u.getPhone().equals(req.getPhone()))
+            throw BusinessException.of("手机号与注册时不一致");
+
+        u.setPasswordHash(encoder.encode(req.getNewPassword()));
+        userRepo.save(u);
+        log.info("用户 {} 通过忘记密码重置了密码", u.getUsername());
     }
 
     // ── 获取用户信息 ──────────────────────────────────────────

@@ -50,12 +50,15 @@ public class SecurityConfig {
             "/api/auth/register",
             "/api/auth/login",
             "/api/auth/refresh",
-            "/api/goods",           // 商品列表公开
-            "/api/goods/search",    // 搜索公开
-            "/api/goods/{id}",      // 商品详情公开
-            "/api/categories",      // 分类公开
-            "/files/**",            // 静态文件
-            "/ws/**",               // WebSocket
+            "/api/auth/reset-password",
+            "/api/captcha",
+            "/api/goods",
+            "/api/goods/search",
+            "/api/goods/{id}",
+            "/api/categories",
+            "/api/orders/reviews/**",
+            "/files/**",
+            "/ws/**",
             "/actuator/health"
     };
 

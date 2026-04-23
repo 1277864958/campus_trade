@@ -22,6 +22,11 @@ public class AuthController {
     public Result<TokenResp> login(@Valid @RequestBody LoginReq req) {
         return Result.success("登录成功", authService.login(req));
     }
+    @PostMapping("/reset-password")
+    public Result<Void> resetPassword(@Valid @RequestBody ResetPasswordReq req) {
+        authService.resetPassword(req);
+        return Result.success("密码重置成功，请使用新密码登录");
+    }
     @PostMapping("/refresh")
     public Result<TokenResp> refresh(@Valid @RequestBody RefreshTokenReq req) {
         return Result.success(authService.refresh(req.getRefreshToken()));
