@@ -15,6 +15,10 @@ public class Goods {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    @Column(name = "version", nullable = false)
+    private Integer version = 0;
+
     @Column(name = "seller_id", nullable = false)
     private Long sellerId;
 

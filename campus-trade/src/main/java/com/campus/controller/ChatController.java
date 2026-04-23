@@ -53,4 +53,16 @@ public class ChatController {
                 Map.of("sessionId", payload.getChatId(), "unreadCount", unread));
         return Result.success(saved);
     }
+
+    // 【新增】：删除聊天记录（支持多选）
+    @DeleteMapping("/sessions/{id}/messages")
+    public Result<Void> deleteMessages(@PathVariable Long id,
+                                       @AuthenticationPrincipal Long userId,
+                                       @RequestBody List<Long> messageIds) {
+        if (messageIds == null || messageIds.isEmpty()) {
+            return Result.success(null);
+        }
+        chatService.deleteMessages(userId, id, messageIds);
+        return Result.success(null);
+    }
 }

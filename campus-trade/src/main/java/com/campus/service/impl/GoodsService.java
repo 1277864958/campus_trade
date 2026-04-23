@@ -42,9 +42,13 @@ public class GoodsService {
         BeanUtils.copyProperties(req, g);
         g.setSellerId(sellerId);
         g.setStatus(req.getStatus() != null ? req.getStatus() : "DRAFT");
-        goodsRepo.save(g);
 
+        // 【核心修复】：重新赋值给 g，获取包含了自增主键 ID 的持久化对象
+        g = goodsRepo.save(g);
+
+        // 此时 g.getId() 绝对有值，不会再引发外键 null 异常
         saveImages(g.getId(), req.getImageUrls());
+
         return toResp(g);
     }
 
@@ -108,6 +112,7 @@ public class GoodsService {
     }
 
     // ── 搜索商品 ──────────────────────────────────────────────
+// ── 搜索商品 ──────────────────────────────────────────────
     public PageResp<GoodsResp> search(GoodsSearchReq req) {
         Sort sort = switch (req.getSortBy()) {
             case "price_asc"  -> Sort.by("price").ascending();
@@ -116,8 +121,21 @@ public class GoodsService {
             default           -> Sort.by("createdAt").descending();
         };
         Pageable pageable = PageRequest.of(req.getPage(), req.getSize(), sort);
+
+        // 关键修复：构造包含当前ID及其所有子级ID的列表
+        java.util.List<Long> categoryIds = new java.util.ArrayList<>();
+        if (req.getCategoryId() != null) {
+            categoryIds.add(req.getCategoryId());
+            // categoryRepo 已在 GoodsService 顶部被注入
+            categoryRepo.findByParentIdOrderBySortAsc(req.getCategoryId())
+                    .forEach(child -> categoryIds.add(child.getId()));
+        } else {
+            categoryIds.add(-1L); // 防止 categoryId 为空时 IN () 语法报错
+        }
+
+        // 调用更新后的 Repo 方法
         Page<Goods> page  = goodsRepo.search(
-                req.getKeyword(), req.getCategoryId(),
+                req.getKeyword(), req.getCategoryId(), categoryIds,
                 req.getMinPrice(), req.getMaxPrice(), pageable);
 
         List<GoodsResp> list = page.getContent().stream().map(this::toResp).toList();

@@ -90,8 +90,10 @@ public class ChatService {
         messageRepo.markAllRead(chatId, userId);
         resetUnread(chatId, userId);
 
-        Page<Message> p = messageRepo.findByChatIdOrderByCreatedAtAsc(
-                chatId, PageRequest.of(page, size));
+        // 【修改点】：显式加上 Sort.by("createdAt").ascending() 保证历史消息按时间正序排列
+        Page<Message> p = messageRepo.findVisibleHistory(
+                chatId, userId, PageRequest.of(page, size, Sort.by("createdAt").ascending()));
+
         return PageResp.of(p.getContent().stream().map(this::toMsgResp).toList(),
                 p.getTotalElements(), page, size);
     }
@@ -116,11 +118,25 @@ public class ChatService {
         redis.delete(String.format(UNREAD_KEY, chatId, userId));
     }
 
-    public long getUnread(Long chatId, Long userId) {
-        String v = redis.opsForValue().get(String.format(UNREAD_KEY, chatId, userId));
-        return v == null ? 0L : Long.parseLong(v);
-    }
+// ── Redis 未读数操作 (优化：加入DB兜底机制) ──────────────────────────────────────
 
+    public long getUnread(Long chatId, Long userId) {
+        String key = String.format(UNREAD_KEY, chatId, userId);
+        String v = redis.opsForValue().get(key);
+
+        if (v != null) {
+            return Long.parseLong(v);
+        }
+
+        // 【核心亮点】：缓存穿透/过期兜底机制 (Cache-Aside)
+        // 如果 Redis 没查到(可能因为 30天 TTL 过期了)，从 DB 里查出真实未读数
+        long dbUnreadCount = messageRepo.countByChatIdAndSenderIdNotAndIsReadFalse(chatId, userId);
+
+        // 重新回写进 Redis，保持一致性
+        redis.opsForValue().set(key, String.valueOf(dbUnreadCount), UNREAD_TTL, TimeUnit.DAYS);
+
+        return dbUnreadCount;
+    }
     // ── 获取接收方 ID ─────────────────────────────────────────
     public Long getReceiverId(ChatSession session, Long senderId) {
         return senderId.equals(session.getBuyerId()) ? session.getSellerId() : session.getBuyerId();
@@ -151,9 +167,11 @@ public class ChatService {
         goodsRepo.findById(s.getGoodsId()).ifPresent(g -> {
             r.setGoodsTitle(g.getTitle());
         });
-        // 最后一条消息
-        Page<Message> last = messageRepo.findByChatIdOrderByCreatedAtAsc(
-                s.getId(), PageRequest.of(0, 1, Sort.by("createdAt").descending()));
+
+        // 【核心修复】：获取最后一条消息时，使用过滤了删除状态的查询，并传入倒序 Sort
+        Page<Message> last = messageRepo.findVisibleHistory(
+                s.getId(), currentUserId, PageRequest.of(0, 1, Sort.by("createdAt").descending()));
+
         last.getContent().stream().findFirst().ifPresent(m -> r.setLastMessage(toMsgResp(m)));
         return r;
     }
@@ -166,5 +184,28 @@ public class ChatService {
             r.setSenderAvatar(u.getAvatarUrl());
         });
         return r;
+    }
+
+    // ── 单向删除部分聊天记录 ─────────────────────────────────
+    @Transactional
+    public void deleteMessages(Long userId, Long chatId, List<Long> messageIds) {
+        ChatSession session = sessionRepo.findById(chatId)
+                .orElseThrow(() -> BusinessException.notFound("会话不存在"));
+        if (!userId.equals(session.getBuyerId()) && !userId.equals(session.getSellerId()))
+            throw BusinessException.forbidden("无权操作此会话");
+
+        List<Message> targetMessages = messageRepo.findAllById(messageIds);
+        for (Message m : targetMessages) {
+            // 安全校验：防止用户越权删除其他会话的消息
+            if (!m.getChatId().equals(chatId)) continue;
+
+            // 判断当前操作人是这条消息的发送方还是接收方，打上对应的删除标记
+            if (m.getSenderId().equals(userId)) {
+                m.setDeletedBySender(true);
+            } else {
+                m.setDeletedByReceiver(true);
+            }
+        }
+        messageRepo.saveAll(targetMessages);
     }
 }
