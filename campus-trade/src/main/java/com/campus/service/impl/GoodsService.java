@@ -33,6 +33,10 @@ public class GoodsService {
     private final BrowseHistoryRepository browseRepo;
     private final ReviewRepository       reviewRepo;
 
+    private final ChatSessionRepository  chatSessionRepo;
+    private final MessageRepository      messageRepo;
+    private final ChatService            chatService;
+
     // ── 发布商品 ──────────────────────────────────────────────
     @Transactional
     public GoodsResp publish(Long sellerId, GoodsReq req) {
@@ -95,9 +99,21 @@ public class GoodsService {
     @Transactional
     public void delete(Long userId, Long goodsId) {
         Goods g = getOwnGoods(userId, goodsId);
+
         if ("RESERVED".equals(g.getStatus()) || "SOLD".equals(g.getStatus()))
             throw BusinessException.of("交易中或已售出的商品不能删除");
         imageRepo.deleteByGoodsId(goodsId);
+
+        // 先查出该商品关联的所有聊天会话
+        List<ChatSession> sessions = chatSessionRepo.findByGoodsId(goodsId);
+        for (ChatSession session : sessions) {
+            // 删除会话底下的所有具体聊天消息
+            messageRepo.deleteByChatId(session.getId());
+        }
+        // 再删除聊天会话本身
+        chatSessionRepo.deleteByGoodsId(goodsId);
+// 2. 调用 ChatService 的级联清理方法 (注入 ChatService)
+        chatService.deleteSessionsByGoodsId(goodsId);
         goodsRepo.delete(g);
     }
 

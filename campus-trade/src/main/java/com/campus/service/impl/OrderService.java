@@ -38,15 +38,23 @@ public class OrderService {
         Goods g = goodsRepo.findById(req.getGoodsId())
                 .orElseThrow(() -> BusinessException.notFound("商品不存在"));
 
+        // 1. 基础校验（内存级拦截）
         if (!"ON_SALE".equals(g.getStatus()))
             throw BusinessException.of("该商品当前不可购买");
         if (g.getSellerId().equals(buyerId))
             throw BusinessException.of("不能购买自己的商品");
-        // 防止重复下单
         if (orderRepo.existsByGoodsIdAndBuyerIdAndStatusIn(
                 g.getId(), buyerId, List.of("PENDING", "CONFIRMED")))
             throw BusinessException.of("您已对该商品下单，请勿重复操作");
 
+        // 2. 【防超卖核心】：执行原子抢占。
+        // 如果返回的 updatedRow 为 0，说明在这短短几毫秒的并发中，商品已经被别人抢先变为 RESERVED 了
+        int updatedRow = goodsRepo.lockGoodsForOrder(g.getId());
+        if (updatedRow == 0) {
+            throw BusinessException.of("手慢了，该商品已被其他同学抢先下单");
+        }
+
+        // 3. 抢占成功，安全生成订单
         Order o = new Order();
         o.setOrderNo(generateOrderNo());
         o.setBuyerId(buyerId);
@@ -57,9 +65,7 @@ public class OrderService {
         o.setStatus("PENDING");
         orderRepo.save(o);
 
-        // 商品标记为已预订
-        g.setStatus("RESERVED");
-        goodsRepo.save(g);
+        // 注意：这里不需要再调用 goodsRepo.save(g) 了，因为上面的 SQL 已经完成了更新
 
         log.info("订单创建成功: {} 买家:{} 商品:{}", o.getOrderNo(), buyerId, g.getId());
         return toResp(o);

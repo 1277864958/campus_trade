@@ -27,4 +27,12 @@ public interface MessageRepository extends JpaRepository<Message, Long> {
 
     // 【新增核心代码】：利用 Spring Data JPA 方法名推导，作为 Redis 未读数过期的兜底查询
     long countByChatIdAndSenderIdNotAndIsReadFalse(Long chatId, Long userId);
+
+
+
+    // 在 MessageRepository 接口中追加：
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Message m WHERE m.chatId = :chatId")
+    void deleteByChatId(@Param("chatId") Long chatId);
 }

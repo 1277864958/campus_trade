@@ -106,6 +106,21 @@ public class ChatService {
                         "unreadCount", getUnread(s.getId(), userId)))
                 .toList();
     }
+    // 在 ChatService 类中添加
+    @Transactional
+    public void deleteSessionsByGoodsId(Long goodsId) {
+        List<ChatSession> sessions = sessionRepo.findByGoodsId(goodsId);
+        for (ChatSession s : sessions) {
+            // 1. 清理 Redis 中的未读数计数器（防止残留）
+            redis.delete(String.format(UNREAD_KEY, s.getId(), s.getBuyerId()));
+            redis.delete(String.format(UNREAD_KEY, s.getId(), s.getSellerId()));
+
+            // 2. 删除该会话的所有消息
+            messageRepo.deleteByChatId(s.getId());
+        }
+        // 3. 删除会话记录
+        sessionRepo.deleteByGoodsId(goodsId);
+    }
 
     // ── Redis 未读数操作 ──────────────────────────────────────
     public void incrementUnread(Long chatId, Long userId) {
